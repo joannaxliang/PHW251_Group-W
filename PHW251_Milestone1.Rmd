@@ -1,0 +1,64 @@
+---
+title: "PHW251_Milestone1"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-09-24'
+---
+
+PHW251: R for Public Health
+
+Group W: Desmond Gill, Nakisa Golabi, Joanna Liang
+
+September 26, 2022 
+
+Milestone #1
+
+Project Selection:  Scenario 3: California Smokers Cohort
+
+Please push to GitHub a word document or PDF with the following information - 
+
+Project option selection
+
+-If creating your own project, please get approval from the teaching team before submitting
+
+Create git repository
+
+-Share a link to your group’s git repository: https://github.com/joannaxliang/PHW251_Group-W.git 
+
+Roles and responsibilities
+
+-Team's preferred communication method 
+
+-Team's preferred meeting times and frequency 
+
+-Team's preferred method for tracking progress
+
+-Point person for contacting course facilitators with questions
+
+-Point person for submitting all milestones
+ 
+ 
+Meeting Planning
+
+-What is your team's preferred communication method - email, text, bcourse messaging? Our team’s preferred communication method is Whatsapp messenger, email and text. 
+
+-When will your team be holding meetings? How frequently will you meet? Are there times or days that work well for everyone? Our team will meet as frequently as necessary but will check in with each other at least once a week. Weeknights are typically best for all group members. We will meet on weekends if necessary (Sunday evenings). 
+
+-Discuss future non-academic commitments that might affect members' availability. Currently there are no major non-academic commitments, any changes will be updated to the group. 
+
+-Discuss meeting tempo: “checking in” at the beginning of meetings versus “just sticking to business”.  Tuesday nights for check ins and if needed, meet again on Thursday nights and weekends to further discuss. 
+
+Roles
+
+-How is your team going to keep track of progress? Who will be taking minutes, creating agendas, and contacting the course facilitators with questions? We will keep track as needed through a shared google doc and checking in weekly to make sure we are on the right track. All members will take turns contacting course facilitators as well as creating zoom meetings and agendas. 
+
+-We encourage you to discuss potential dates and times to meet with a course facilitator during Weeks 3-5. Decide on the best date and time for all. Tuesdays and Thursdays at 7 pm are good for our group. 
+
+-Determine a point person to submit each assignment for the team. Joanna will submit each assignment for the team. 
+Conflict Management
+
+-If a conflict arises, plan to solve the issue as soon as possible. This is best done using synchronous (Zoom, Google Hangouts) communication rather than asynchronous (email). Be communicative if any issues arise and discuss during weekly meetings. 
+
+-If the group is unable to resolve the conflict, seek advice from the instructional team. 
+
