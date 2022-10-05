@@ -1,0 +1,95 @@
+---
+title: "PHW251 Data Project Milestone 2"
+author: "Nakisa Golabi, Joanna Liang, Desmond Gill"
+date: "09/29/2022"
+output:
+pdf_document: default
+html_document:
+df_print: paged
+word_document: default
+---
+
+
+#Description of dataset
+#What is the data source? (1-2 sentences on where the data is coming from, dates included, etc.) 
+ca_csc_smoker_data.csv; ca_csc_outcome_race_data.csv
+This data source is from the UC San Diego library collections: (https://library.ucsd.edu/dc/object/bb6282371f). Creation date is 2011-2012 and it is a cross-sectional study looking at tobacco use and behaviors among Californians. 
+
+
+#How does the dataset relate to the group problem statement and question?
+The dataset provides the raw data needed to analyze the participant behaviors. We are interested in seeing the effects of certain individual behaviors & how this relates to smoking status as well as disease status (heart disease).
+
+#Import statement
+NOTE: Please use datasets available in the PHW251 Project Data github repoLinks to an external site. (this is important to make sure everyone is using the same datasets)
+Use appropriate import function and package based on the type of file
+Utilize function arguments to control relevant components (i.e. change column types, column names, missing values, etc.)
+Document the import process
+
+
+```{r import}
+library(readr)
+library(readxl)
+library(tidyverse)
+library(tibble)
+library(dplyr)
+
+url_file = "https://raw.githubusercontent.com/PHW290/phw251_projectdata/main/ca_csc_smoker_data.csv"
+
+smoker_dataset <- read_csv(url_file)
+
+url_file_2 = "https://raw.githubusercontent.com/PHW290/phw251_projectdata/main/ca_csc_outcome_race_data.csv"
+
+smoker_dataset_race <- read_csv(url_file_2)
+```
+
+```{r dataset alter}
+
+dataset_rename <- rename(smoker_dataset, ID = "psraid")
+
+dataset_rename
+
+```
+
+#Identify data types for 5+ data elements/columns/variables
+#Identify 5+ data elements required for your specified scenario. If <5 elements are required to complete the analysis, please choose additional variables of interest in the data set to explore in this milestone.
+Cigarette brands (SMKBRAND), current smoking status (smokstat), location of cigarette purchase (WHEREBUY), have you ever seriously considered quitting? (CONSIDER), compared to a year ago, how often are you smoking? (SMOKMORE), race (RACE), heart disease (HEARTDIS)
+
+#Utilize functions or resources in RStudio to determine the types of each data element (i.e. character, numeric, factor)
+
+``` {r data types}
+
+class(dataset_rename)
+
+class(smoker_dataset_race)
+
+typeof(dataset_rename)
+
+typeof(smoker_dataset_race)
+
+tibble(dataset_rename)
+
+tibble(smoker_dataset_race)
+
+```
+#Identify the desired type/format for each variable‚Äîwill you need to convert any columns to numeric or another type? 
+Will organize columns/rename/tidy as needed. 
+
+#Provide a basic description of the 5+ data elements
+#Numeric: mean, median, range
+#Character:  unique values/categories
+#Or any other descriptives that will be useful to the analysis
+
+SMKBRAND: Character variable; types of cigarette brands the individuals smoke (American Spirit, Basic, Benson & Hedges, Camel, Capri, Carlton, Djarum, Doral, Generic, GPC, Kent, Kool, Lucky Strike, Marlboro, Merit, Misty, More, Newport,  Pall Mall, Parliament, Philip Morris, Raleigh, Salem, Virginia Slims, Winston, No special brand, Other (SPECIFY), REFUSED,  DON'T KNOW)
+
+smokstat: Character variable; unique values/categories: current Daily Smoker, Current Nondaily Smoker, Recent Quitter, Long-term quitter, Unspecified quitter, Never-Smoker, Unknown Smoking Status.
+
+WHEREBUY: Character variable; unique values/categories: At convenience stores or gas stations, At super markets, At liquor stores or drug stores, At tobacco discount stores, At other discount or warehouse stores such as Wal-Mart or Costco, On Indian reservations, In military commissaries, Somewhere else?, (Specify), REFUSED, DON'T KNOW
+
+CONSIDER: Character variable; unique values/categories: Yes, No, REFUSED, DON'T KNOW
+
+SMOKMORE: Character variable; unique values/categories: The same as you were before, More than you were before, Less than you were before, REFUSED, DON'T KNOW
+
+RACE: Character variable; unique values/categories: White, Black, Japanese, Chinese, Filipino, Korean, Vietnamese, Other Asian or Pacific Islander, American Indian or Alaskan Native, Mexican, Hispanic/Latino, Asian Indian, OTHER (Specify), REFUSED, DON'T KNOW
+
+HEARTDIS: Character variable; unique values/categories: Yes, No, REFUSED, DON'T KNOW
+
