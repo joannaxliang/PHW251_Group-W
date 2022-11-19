@@ -1,0 +1,318 @@
+---
+title: "PHW251 Data Project Milestone 4"
+author: "Nakisa Golabi, Joanna Liang, Desmond Gill"
+date: "11/16/2022"
+output: pdf_document
+---
+
+
+\newpage
+```{r import,include=F}
+library(readr)
+library(readxl)
+library(tidyverse)
+library(tibble)
+library(dplyr)
+
+url_file = "https://raw.githubusercontent.com/PHW290/phw251_projectdata/main/ca_csc_smoker_data.csv"
+
+smoker_dataset <- read_csv(url_file)
+
+url_file_2 = "https://raw.githubusercontent.com/PHW290/phw251_projectdata/main/ca_csc_outcome_race_data.csv"
+
+smoker_dataset_race <- read_csv(url_file_2)
+
+dataset_rename <- rename(smoker_dataset, ID = "psraid")
+
+dataset_rename 
+head(dataset_rename)
+```
+
+\newpage
+```{r, include=F}
+#Subset rows or columns
+
+smoker_dataset_clean <- rename_with(smoker_dataset, ~ tolower(gsub(" ","_", .x, 
+                                                                 fixed=TRUE)))
+
+smoker_dataset_race_clean <- rename_with(smoker_dataset_race, ~ tolower(gsub(" ","_", .x, 
+                                                                 fixed=TRUE)))
+
+smoker_dataset_race_clean$id<-gsub("DIS","",as.character(smoker_dataset_race_clean$id))
+smoker_dataset_race_clean$id<-gsub("STAT","",as.character(smoker_dataset_race_clean$id))
+
+dataset1 <- rename(smoker_dataset_clean, id=psraid)
+
+jointdataset <- merge(dataset1, smoker_dataset_race_clean, by = c('id'))
+
+```
+
+\newpage
+```{r, include=F}
+#Create new variables needed for analysis (minimum 2)
+
+jointdataset_2 <- na_if(jointdataset, "(DO NOT READ) Don't know")
+jointdataset_3 <- na_if(jointdataset_2, "(DO NOT READ) Refused")
+
+jointdataset_3$smkage[jointdataset_3$smkage=="5 years old or less"]<-"5"
+jointdataset_3$smkage[jointdataset_3$smkage=="Never smoked regularly"]<-"0"
+jointdataset_3$smk1age[jointdataset_3$smk1age=="5 years old or less"]<-"5"
+
+jointdataset_4 <- drop_na(jointdataset_3, smk1age, smkage)
+
+jointdataset_4$smkage <- as.numeric(as.character(jointdataset_4$smkage))
+jointdataset_4$smk1age <- as.numeric(as.character(jointdataset_4$smk1age))
+
+#Variable 1
+jointdataset_5 <- jointdataset_4 %>% 
+   mutate(smoker_onset = (smkage - smk1age))
+
+jointdataset_5$howmany[jointdataset_5$howmany=="100 or more cigarettes"]<-"100"
+jointdataset_6 <- drop_na(jointdataset_5, howmany)
+
+#Variable 2
+clean_data <- jointdataset_6 %>% group_by(smokstat, howmany) %>%
+  mutate(smoke_level= case_when(
+    smokstat=="Current nondaily smoker" & howmany <= 10 ~ "nondaily low level", 
+    smokstat=="Current nondaily smoker" & howmany <= 30  ~ "nondaily medium level", 
+    smokstat=="Current nondaily smoker" ~ "nondaily high level", 
+    smokstat=="Current daily smoker" & howmany <= 10 ~ "daily low level", 
+    smokstat=="Current daily smoker" & howmany <= 30  ~ "daily medium level", 
+    smokstat=="Current daily smoker" ~ "daily high level"
+  ))
+
+#Variable 3
+clean_data2 <- drop_na(clean_data, smok6num)
+clean_data3 <- drop_na(clean_data2, smok6uni)
+
+clean_data3$howmany <- as.numeric(as.character(clean_data3$howmany))
+clean_data4 <- mutate(clean_data3, packs = howmany/20)
+
+clean_data4$smok6num <- as.numeric(as.character(clean_data4$smok6num))
+
+clean_data5 <- clean_data4 %>% mutate(smoking_years = 
+                               case_when(
+               smok6uni == "Years" ~ smok6num, 
+               smok6uni == "Months" ~ smok6num/12,
+               smok6uni == "Days" ~ smok6num/365,
+               ))
+
+clean_data6 <- clean_data5 %>% mutate(pack_years= round(packs*smoking_years, 2))
+```
+
+\newpage
+```{r, include=F}
+#Clean variables needed for analysis (minimum 2)
+
+#smkbrand
+clean_data6$smkbrand[clean_data6$smkbrand=="Other (SPECIFY)"]<-"Other"
+clean_data7 <- drop_na(clean_data6, smkbrand)
+
+#wherebuy
+clean_data7$wherebuy[clean_data7$wherebuy=="Somewhere else (SPECIFY)?"]<-"Somewhere else"
+clean_data8 <- drop_na(clean_data7, wherebuy)
+
+#not including consider in analysis
+
+#smokmore
+clean_data9 <- drop_na(clean_data8, smokmore)
+
+#heartdis
+clean_data10 <- drop_na(clean_data9, heartdis)
+
+#othmenill
+clean_data11 <- drop_na(clean_data10, othmenill)
+
+#diabetes
+clean_data12 <- drop_na(clean_data11, diabetes)
+
+#asthma
+clean_data13 <- drop_na(clean_data12, asthma)
+
+#race
+clean_data14 <- clean_data13 
+clean_data14$race01 <- if_else(clean_data13$race01 =="Yes",1,0)
+clean_data14$race02 <- if_else(clean_data13$race02 =="Yes",1,0)
+clean_data14$race03 <- if_else(clean_data13$race03 =="Yes",1,0)
+clean_data14$race04 <- if_else(clean_data13$race04 =="Yes",1,0)
+clean_data14$race05 <- if_else(clean_data13$race05 =="Yes",1,0)
+clean_data14$race06 <- if_else(clean_data13$race06 =="Yes",1,0)
+clean_data14$race12 <- if_else(clean_data13$race12 =="Yes",1,0)
+clean_data14$race07 <- if_else(clean_data13$race07 =="Yes",1,0)
+clean_data14$race08 <- if_else(clean_data13$race08 =="Yes",1,0)
+clean_data14$race09 <- if_else(clean_data13$race09 =="Yes",1,0)
+clean_data14$race10 <- if_else(clean_data13$race10 =="Yes",1,0)
+clean_data14$race13 <- if_else(clean_data13$race13 =="Yes",1,0)
+clean_data14$race11 <- if_else(clean_data13$race11 =="Yes",1,0)
+clean_data14$race14 <- if_else(clean_data13$race14 =="Yes",1,0)
+clean_data14$race15 <- if_else(clean_data13$race15 =="Yes",1,0)
+
+clean_data14$race01[is.na(clean_data14$race01)] = 0
+clean_data14$race02[is.na(clean_data14$race02)] = 0
+clean_data14$race03[is.na(clean_data14$race03)] = 0
+clean_data14$race04[is.na(clean_data14$race04)] = 0
+clean_data14$race05[is.na(clean_data14$race05)] = 0
+clean_data14$race06[is.na(clean_data14$race06)] = 0
+clean_data14$race12[is.na(clean_data14$race12)] = 0
+clean_data14$race07[is.na(clean_data14$race07)] = 0
+clean_data14$race08[is.na(clean_data14$race08)] = 0
+clean_data14$race09[is.na(clean_data14$race09)] = 0
+clean_data14$race10[is.na(clean_data14$race10)] = 0
+clean_data14$race13[is.na(clean_data14$race13)] = 0
+clean_data14$race11[is.na(clean_data14$race11)] = 0
+clean_data14$race14[is.na(clean_data14$race14)] = 0
+clean_data14$race15[is.na(clean_data14$race15)] = 0
+
+sum(clean_data14$race11)
+sum(clean_data14$race14)
+sum(clean_data14$race15)
+
+clean_data15 <- clean_data14 %>% 
+  mutate(race_num = race01+ race02+ race03+ race04+ race05 +race06+
+           race12 + race07+ race08 + race09+ race10+ race13)
+
+clean_data16 <- filter(clean_data15, id != 100099 & id != 100109 & id != 100191 
+                       & id != 100206 & id != 100232)
+      
+
+```
+
+
+\newpage
+PRINT-QUALITY TABLE THAT SHOWS THE AVERAGE NUMBER OF PACK-YEARS AND THE 
+DISEASE OUTCOMES 
+
+
+```{r, include=F}
+
+asthma_data <- filter(clean_data16, asthma=="Yes")
+mean(asthma_data$pack_years)
+#mean asthma pack_years 23.9261
+
+heartdis_data <- filter(clean_data16, heartdis=="Yes")
+mean(heartdis_data$pack_years)
+#mean heartdis pack_years 28.82653
+
+othmenill_data <- filter(clean_data16, othmenill=="Yes")
+mean(othmenill_data$pack_years)
+#mean othmenill pack_years 18.94233
+
+diabetes_data <- filter(clean_data16, diabetes=="Yes")
+mean(diabetes_data$pack_years)
+#mean diabetes pack_years 30.10132
+
+tibble_py_disease <- tibble(
+  disease_outcomes = c("Asthma","Heart Disease","Mental Illness","Diabetes"),
+  avg_pack_years = c(23.9261, 28.82653, 18.94233, 30.10132), 
+)
+
+library(kableExtra)
+library(tidyverse)
+library(ggthemes)
+
+```
+
+
+
+```{r print quality table for pack-years and disease outcomes}
+
+kable(tibble_py_disease, booktabs = T, digits = 2, escape=F,
+                   col.names=c("Outcomes", "Pack-Years"), 
+                   align="cc",
+                   caption = "Average Pack-Years Per Disease Outcome")
+
+
+```
+
+The table compares the average number of pack-years (the product of the number 
+of packs of cigarettes smoked per day and the years a person has smoked) by 
+the disease outcomes of asthma, heart disease, diabetes, and mental illness. 
+Those with diabetes had the highest mean and those with mental illness 
+had the lowest mean. 
+
+
+\newpage
+PLOT COMPARING RACE AND BEHAVIORAL FACTOR OF CIGARETTE BRANDS PURCHASED
+```{r, include=F}
+
+clean_data17 <- clean_data16 %>% mutate_at(c('race_num'), ~na_if(., 0))
+clean_data17 <- drop_na(clean_data17, race_num)
+
+df1 <- clean_data17 %>% select(smkbrand, race_num)
+
+df2 <- df1 %>%
+  group_by(smkbrand, race_num) %>%
+  summarize(counts = n()) %>%
+  mutate(race_char=as.character(race_num))
+
+
+```
+
+
+
+```{r plot comparing race and behavioral factor of cigarette brand}
+
+ggplot(data=df2, aes(x = counts, y=factor(smkbrand), fill=race_char)) + 
+  geom_bar(aes(fill=race_char), stat="identity", position=position_dodge2()) +
+  labs(x="Counts",y="Cigarette Brands Purchased",
+       title="Cigarette Brands Purchased vs. Racial Identification",
+    caption="Data Source: California Department of Public Health 2011 California Smokers Cohort.")+
+  scale_fill_manual(name="Self-Reported Races by Each Smoker",
+                    values=c("cyan3","darkorange", "darkgreen"))+
+  theme(legend.position="bottom")
+ 
+
+
+```
+
+This visualization compares the cigarette brands purchased by each smoker with 
+their racial identification (number of races self-reported), in the CDPH 2011 
+California Smokers Cohort. Out of 712 total smokers, Marlboro is the highest 
+purchased cigarette brand by 290 smokers with self-reported one race and by 14 
+smokers with self-reported two races; Camel is the highest purchased cigarette 
+brand by 2 smokers with self-reported three races. 
+
+\newpage
+PLOT COMPARING RACE AND SMOKER ONSET
+```{r, include=F}
+df3 <- clean_data17 %>% select(smoker_onset, race_num)
+df3 <- df3 %>% mutate(race_char=as.character(race_num))
+
+library(dplyr)
+df4 <- df3 %>% mutate(smoker_onset=replace(smoker_onset, which(smoker_onset<0), NA))
+df4 <- drop_na(df4, smoker_onset)
+
+df_race1 <- filter(df4, race_char=="1")
+df_race2 <- filter(df4, race_char=="2")
+df_race3 <- filter(df4, race_char=="3")
+
+median(df_race1$smoker_onset)
+median(df_race2$smoker_onset)
+median(df_race3$smoker_onset)
+
+```
+
+```{r plot comparing race and smoker onset}
+  
+ggplot(data=df4, aes(x=race_char,y=smoker_onset)) +
+  geom_boxplot(aes(colour=race_char)) +
+  theme(legend.position="none") +
+  labs(x="Self-Reported Races by Each Smoker",y="Smoker Onset", 
+       title="Comparing Smoker Onset with Racial Identification", caption=
+  "Data Source: California Department of Public Health 2011 California Smokers Cohort.")
+
+
+```
+
+This box plot compares smoker onset (the difference between the age when they 
+started smoking regularly and the age of the participant's first cigarette) 
+with their racial identification (number of races self-reported), in the 
+CDPH 2011 California Smokers Cohort. The medians for smoker onset are
+2.00, 2.00 and 4.00 years for smokers with self-reported one race, two races, 
+and three races, respectively. 
+
+
+
+
+
+
